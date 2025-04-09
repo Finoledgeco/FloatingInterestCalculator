@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floating Interest Calculator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #001777;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .calculator {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            width: 100%;
+            max-width: 900px;
+        }
+        
+        h2 {
+            color: #001777;
+            font-size: 20px;
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+                .description {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+        
+        input[type="number"], select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="number"]:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        
+        .range-slider {
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .range-slider input[type="range"] {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            background: #ddd;
+            border-radius: 4px;
+            outline: none;
+        }
+        
+        .range-slider input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #3498db;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+        
+        button {
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .calculate-btn {
+            background-color: #001777;
+            color: white;
+            flex: 1;
+        }
+        
+        .reset-btn {
+            background-color: #f1f1f1;
+            color: #333;
+            flex: 1;
+        }
+        
+        .add-rate-btn {
+            background-color: #2ecc71;
+            color: white;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            opacity: 0.9;
+        }
+        
+        .result-container {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 25px;
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .result-label {
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .result-value {
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 18px;
+        }
+        
+        .highlight {
+            color: #3498db;
+        }
+        
+        .amortization-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        
+        .amortization-table th, 
+        .amortization-table td {
+            padding: 8px;
+            text-align: right;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .amortization-table th {
+            background-color: #f5f5f5;
+            font-weight: 600;
+            text-align: center;
+            position: sticky;
+            top: 0;
+        }
+        
+        .amortization-table tr:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .rate-change-row {
+            background-color: #fffde7;
+        }
+        
+        .table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+            border: 1px solid #eee;
+            border-radius: 6px;
+        }
+        
+        .rate-change-container {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        .remove-rate-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .about-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h2>FLOATING INTEREST CALCULATOR</h2>
+        <p class="description"><b>Finoledge Floating Interest Calculator</b> helps you anticipate EMI changes on variable-rate loans (like home loans) by calculating interest adjustments based on projected rate fluctuations. It provides an amortization schedule showing how each payment splits between principal and interest, your outstanding balance over time, and total interest burden – helping you visualize the long-term impact of rate changes and plan prepayments strategically. Finoledge – Smart Tools for Smarter Borrowing!</p>
+        <div class="input-group">
+            <label for="loan-amount">Loan Amount (₹)</label>
+            <input type="number" id="loan-amount" placeholder="Ex. 1000000" >
+        </div>
+        
+        <div class="input-group">
+            <label for="loan-tenure">Loan Tenure (years)</label>
+            <input type="number" id="loan-tenure" placeholder="Ex. 20"  min="1" max="30">
+        </div>
+        
+        <div class="input-group">
+            <label for="initial-rate">Initial Interest Rate (%)</label>
+            <input type="number" id="initial-rate" step="0.01" placeholder="Ex. 7.5">
+        </div>
+        
+        <div id="rate-changes-container">
+            <!-- Rate changes will be added here -->
+        </div>
+        
+        <button class="add-rate-btn" onclick="addRateChange()">+ Add Rate Change</button>
+        
+        <div class="button-group">
+            <button class="calculate-btn" onclick="calculateLoan()">Calculate</button>
+                    </div>
+        
+        <div class="result-container">
+            <div class="result-item">
+                <span class="result-label">Initial Interest Rate</span>
+                <span class="result-value" id="initial-rate-display">0%</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Initial Monthly EMI</span>
+                <span class="result-value highlight" id="emi-display">₹0</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Total Interest Payable</span>
+                <span class="result-value" id="total-interest">₹0</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Total Payment</span>
+                <span class="result-value" id="total-payment">₹0</span>
+            </div>
+        </div>
+        
+        <div id="amortization-container" style="display: none;">
+            <h3>Monthly Amortization Schedule</h3>
+            <div class="table-container">
+                <table class="amortization-table">
+                    <thead>
+                        <tr>
+                            <th>Month</th>
+                            <th>EMI</th>
+                            <th>Interest</th>
+                            <th>Principal Paid</th>
+                            <th>Remaining</th>
+                            <th>Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody id="amortization-body">
+                        <!-- Amortization data will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="about-section">
+            Finoledge Floating Interest Rate & Amortization Calculator
+        </div>
+    </div>
+
+    <script>
+        let rateChangeCount = 0;
+        
+        // Initialize with default values
+        window.onload = function() {
+            updateInitialRateDisplay();
+            addRateChange(); // Add first rate change by default
+        };
+        
+        function addRateChange() {
+            rateChangeCount++;
+            const container = document.getElementById('rate-changes-container');
+            const rateChangeDiv = document.createElement('div');
+            rateChangeDiv.className = 'rate-change-container';
+            rateChangeDiv.dataset.id = rateChangeCount;
+            
+            rateChangeDiv.innerHTML = `
+                <button class="remove-rate-btn" onclick="removeRateChange(${rateChangeCount})">✕</button>
+                <div class="input-group">
+                    <label>Rate Change After (years)</label>
+                    <input type="number" class="rate-change-years" placeholder="Ex. 5" value="${rateChangeCount === 1 ? 5 : ''}" min="1">
+                </div>
+                <div class="input-group">
+                    <label>New Interest Rate (%)</label>
+                    <input type="number" class="new-rate" step="0.01" placeholder="Ex. 8.5" value="${rateChangeCount === 1 ? 8.5 : ''}">
+                </div>
+            `;
+            
+            container.appendChild(rateChangeDiv);
+        }
+        
+        function removeRateChange(id) {
+            if (document.querySelectorAll('.rate-change-container').length <= 1) return;
+            const element = document.querySelector(`.rate-change-container[data-id="${id}"]`);
+            if (element) element.remove();
+        }
+        
+        function updateInitialRateDisplay() {
+            const rate = document.getElementById('initial-rate').value;
+            document.getElementById('initial-rate-display').textContent = rate + '%';
+        }
+        
+        function calculateLoan() {
+            // Get loan details
+            const principal = parseFloat(document.getElementById('loan-amount').value) || 0;
+            const tenureYears = parseFloat(document.getElementById('loan-tenure').value) || 1;
+            const totalMonths = tenureYears * 12;
+            const initialRate = parseFloat(document.getElementById('initial-rate').value) || 0;
+            
+            // Get all rate changes
+            const rateChanges = [];
+            const rateContainers = document.querySelectorAll('.rate-change-container');
+            
+            rateContainers.forEach(container => {
+                const years = parseFloat(container.querySelector('.rate-change-years').value) || 0;
+                const rate = parseFloat(container.querySelector('.new-rate').value) || 0;
+                const months = years * 12;
+                
+                if (months > 0 && rate > 0) {
+                    rateChanges.push({
+                        month: months,
+                        rate: rate
+                    });
+                }
+            });
+            
+            // Sort rate changes by month
+            rateChanges.sort((a, b) => a.month - b.month);
+            
+            // Calculate initial EMI (will change when rates change)
+            let currentEMI = calculateEMI(principal, initialRate, totalMonths);
+            document.getElementById('emi-display').textContent = formatCurrency(currentEMI);
+            updateInitialRateDisplay();
+            
+            // Generate amortization schedule
+            const amortizationBody = document.getElementById('amortization-body');
+            amortizationBody.innerHTML = '';
+            
+            let balance = principal;
+            let totalInterest = 0;
+            let currentRate = initialRate;
+            let nextRateChange = rateChanges.length > 0 ? rateChanges.shift() : null;
+            let remainingMonths = totalMonths;
+            let isRateChangeMonth = false;
+            
+            for (let month = 1; month <= totalMonths; month++) {
+                // Check if we need to change rate this month
+                isRateChangeMonth = false;
+                if (nextRateChange && month > nextRateChange.month) {
+                    currentRate = nextRateChange.rate;
+                    remainingMonths = totalMonths - month + 1;
+                    currentEMI = calculateEMI(balance, currentRate, remainingMonths);
+                    nextRateChange = rateChanges.length > 0 ? rateChanges.shift() : null;
+                    isRateChangeMonth = true;
+                }
+                
+                const monthlyRate = currentRate / (12 * 100);
+                const interest = balance * monthlyRate;
+                const principalPaid = currentEMI - interest;
+                totalInterest += interest;
+                balance -= principalPaid;
+                
+                // Add to amortization table
+                const row = document.createElement('tr');
+                if (isRateChangeMonth) {
+                    row.classList.add('rate-change-row');
+                }
+                row.innerHTML = `
+                    <td>${month}</td>
+                    <td>${formatCurrency(currentEMI)}</td>
+                    <td>${formatCurrency(interest)}</td>
+                    <td>${formatCurrency(principalPaid)}</td>
+                    <td>${formatCurrency(Math.max(balance, 0))}</td>
+                    <td>${currentRate.toFixed(2)}%</td>
+                `;
+                amortizationBody.appendChild(row);
+            }
+            
+            // Update results
+            document.getElementById('total-interest').textContent = formatCurrency(totalInterest);
+            document.getElementById('total-payment').textContent = formatCurrency(principal + totalInterest);
+            
+            // Show amortization table
+            document.getElementById('amortization-container').style.display = 'block';
+        }
+        
+        function calculateEMI(principal, annualRate, months) {
+            const monthlyRate = annualRate / (12 * 100);
+            if (monthlyRate === 0) return principal / months;
+            return principal * monthlyRate * Math.pow(1 + monthlyRate, months) / (Math.pow(1 + monthlyRate, months) - 1);
+        }
+        
+        function formatCurrency(amount) {
+            return '₹' + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        }
+        
+        function resetForm() {
+            document.getElementById('loan-amount').value = '1000000';
+            document.getElementById('loan-tenure').value = '20';
+            document.getElementById('initial-rate').value = '7.5';
+            
+            document.getElementById('rate-changes-container').innerHTML = '';
+            rateChangeCount = 0;
+            addRateChange();
+            
+            document.getElementById('emi-display').textContent = '₹0';
+            document.getElementById('total-interest').textContent = '₹0';
+            document.getElementById('total-payment').textContent = '₹0';
+            document.getElementById('initial-rate-display').textContent = '7.5%';
+            
+            document.getElementById('amortization-container').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
